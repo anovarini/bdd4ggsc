@@ -1,0 +1,67 @@
+apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'idea'
+
+compileJava.enabled = false
+compileTestJava.enabled = false
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'http://oss.sonatype.org/content/repositories/snapshots'
+    }
+}
+
+sourceSets {
+	specs_ud {
+		groovy {
+			srcDir 'src/aat/ud'
+		}
+		resources {
+			srcDir 'src/aat/ud'
+		}
+        output.classesDir = 'build/aat/ud/bin'
+        output.resourcesDir = 'build/aat/ud/resources'
+	}
+	specs_done {
+		groovy {
+			srcDir 'src/aat/done'
+		}
+		resources {
+			srcDir 'src/aat/done'
+		}
+        output.classesDir = 'build/aat/done/bin'
+        output.resourcesDir = 'build/aat/done/resources'
+	}
+}
+
+dependencies {
+    groovy(
+            [group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.0.0'],
+    )
+    testCompile(
+            [group: 'org.spockframework', name: 'spock-core', version: '0.7-groovy-2.0-SNAPSHOT'],
+    )
+    specs_udCompile(    
+            [group: 'org.concordion', name: 'concordion', version: '1.4.2'],
+    )
+    specs_doneCompile(
+            [group: 'org.concordion', name: 'concordion', version: '1.4.2'],
+    )
+}
+
+task specs_ud(type: Test) {
+    testClassesDir = sourceSets.specs_ud.output.classesDir
+    classpath = 
+    	sourceSets.specs_ud.runtimeClasspath + sourceSets.main.runtimeClasspath
+}
+
+task specs_done(type: Test) {
+    testClassesDir = sourceSets.specs_done.output.classesDir
+    classpath = 
+    	sourceSets.specs_done.runtimeClasspath + sourceSets.main.runtimeClasspath
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.0'
+}
