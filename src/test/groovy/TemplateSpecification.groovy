@@ -6,7 +6,6 @@ import org.spockframework.runtime.Sputnik
 class TemplateSpecification extends Specification {
 
     def "pushing element on the stack"() {
-
         setup:
         def stack = new Stack()
         def elem = "push me"
@@ -18,7 +17,5 @@ class TemplateSpecification extends Specification {
         !stack.empty
         stack.size() == 1
         stack.peek() == elem
-
     }
-
 }
