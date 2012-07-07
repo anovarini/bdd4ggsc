@@ -14,12 +14,8 @@ repositories {
 
 sourceSets {
 	specs_ud {
-		groovy {
-			srcDir 'src/aat/ud'
-		}
-		resources {
-			srcDir 'src/aat/ud'
-		}
+		groovy.srcDir file('src/aat/ud')
+		resources.srcDir file('src/aat/ud')
         output.classesDir = 'build/aat/ud/bin'
         output.resourcesDir = 'build/aat/ud/resources'
 	}
@@ -35,31 +31,43 @@ sourceSets {
 	}
 }
 
+def concordion = [group: 'org.concordion', name: 'concordion', version: '1.4.2']
+
 dependencies {
     groovy(
             [group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.0.0'],
     )
     testCompile(
             [group: 'org.spockframework', name: 'spock-core', version: '0.7-groovy-2.0-SNAPSHOT'],
+            concordion
     )
-    specs_udCompile(    
-            [group: 'org.concordion', name: 'concordion', version: '1.4.2'],
+    specs_udCompile(
+            sourceSets.main.output,
+            configurations.testCompile,
+            sourceSets.test.output,
+            configurations.testRuntime,
+            concordion,
     )
     specs_doneCompile(
-            [group: 'org.concordion', name: 'concordion', version: '1.4.2'],
+            sourceSets.main.output,
+            configurations.testCompile,
+            sourceSets.test.output,
+            configurations.testRuntime,
+            concordion,
     )
 }
 
-task specs_ud(type: Test) {
+task specs_ud(type: Test, dependsOn: jar) {
     testClassesDir = sourceSets.specs_ud.output.classesDir
-    classpath = 
-    	sourceSets.specs_ud.runtimeClasspath + sourceSets.main.runtimeClasspath
+    classpath = sourceSets.specs_ud.runtimeClasspath
+    systemProperties['jar.path'] = jar.archivePath
 }
 
-task specs_done(type: Test) {
+
+task specs_done(type: Test, dependsOn: jar) {
     testClassesDir = sourceSets.specs_done.output.classesDir
-    classpath = 
-    	sourceSets.specs_done.runtimeClasspath + sourceSets.main.runtimeClasspath
+    classpath = sourceSets.specs_done.runtimeClasspath
+    systemProperties['jar.path'] = jar.archivePath
 }
 
 task wrapper(type: Wrapper) {
